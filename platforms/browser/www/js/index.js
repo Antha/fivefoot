@@ -21,12 +21,16 @@
       enableHighAccuracy: true,
       maximumAge: 3600000
    }
+
+   $("#loading").html("<img src='img/loading.gif' />");
    var watchID = navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
 
    function onSuccess(position) {
      var lat = position.coords.latitude;         
      var lang = position.coords.longitude; 
-     app.googleMapPos(lat,lang); 
+     app.googleMapPos(lat,lang);
+     alert("Setting Position Success !!!"); 
+     $("#loading").html("");
    };
 
    function onError(error) {
@@ -34,6 +38,8 @@
       var lat = -8.573826 ;
       var lang = 115.222807 ;
       app.googleMapPos(lat,lang);  
+      alert("Setting Position Success !!!"); 
+      $("#loading").html("");
    }
 
 }
@@ -74,12 +80,29 @@ var app = {
     initialize: function() {
         this.bindEvents();
         this.googleMap(-8.673826,115.222807);
+
     },
 
     googleMap(lat,lang){
         var myLatlng = new google.maps.LatLng(lat,lang);
         var mapOptions = {zoom: 7,center: myLatlng}
         var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+         
+        //fetch data
+        $.ajax({
+             type: "POST",
+             url:"https://zenna.esy.es/fivefoot/people_select.php",
+             data: {},
+             crossDomain: true,
+             cache: false,
+             beforeSend: function(){
+               //$("#insert").val('Connecting...');
+             },
+             success: function(data){
+                 var dataParsed = JSON.parse(data);
+                 alert(dataParsed);
+             }
+        });
     },
 
     googleMapPos(lat,lang){
