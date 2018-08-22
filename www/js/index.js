@@ -24,23 +24,18 @@
    var watchID = navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
 
    function onSuccess(position) {
-     
+     var lat = position.coords.latitude;         
+     var lang = position.coords.longitude; 
+     app.googleMapPos(lat,lang); 
    };
 
    function onError(error) {
-      alert('code: '    + error.code    + '\n' + 'message: ' + error.message + '\n');
+      //alert('code: '    + error.code    + '\n' +'message: ' + error.message + '\n');
+      var lat = -8.573826 ;
+      var lang = 115.222807 ;
+      app.googleMapPos(lat,lang);  
    }
 
-   function showAlert(){
-       alert('Latitude: '          + position.coords.latitude          + '\n' +
-         'Longitude: '         + position.coords.longitude         + '\n' +
-         'Altitude: '          + position.coords.altitude          + '\n' +
-         'Accuracy: '          + position.coords.accuracy          + '\n' +
-         'Altitude Accuracy: ' + position.coords.altitudeAccuracy  + '\n' +
-         'Heading: '           + position.coords.heading           + '\n' +
-         'Speed: '             + position.coords.speed             + '\n' +
-         'Timestamp: '         + position.timestamp                + '\n');
-   }
 }
 
 function watchPosition() {
@@ -52,18 +47,25 @@ function watchPosition() {
    var watchID = navigator.geolocation.watchPosition(onSuccess, onError, options);
 
    function onSuccess(position) {
-      alert('Latitude: '          + position.coords.latitude          + '\n' +
+       var lat = position.coords.latitude;         
+       var lang = position.coords.longitude; 
+       app.googleMapPos(lat,lang); 
+      /*alert('Latitude: '          + position.coords.latitude          + '\n' +
          'Longitude: '         + position.coords.longitude         + '\n' +
          'Altitude: '          + position.coords.altitude          + '\n' +
          'Accuracy: '          + position.coords.accuracy          + '\n' +
          'Altitude Accuracy: ' + position.coords.altitudeAccuracy  + '\n' +
          'Heading: '           + position.coords.heading           + '\n' +
          'Speed: '             + position.coords.speed             + '\n' +
-         'Timestamp: '         + position.timestamp                + '\n');
+         'Timestamp: '         + position.timestamp                + '\n');*/
+       
    };
 
    function onError(error) {
-      alert('code: '    + error.code    + '\n' +'message: ' + error.message + '\n');
+      //alert('code: '    + error.code    + '\n' +'message: ' + error.message + '\n');
+      var lat = -8.673826 ;
+      var lang = 115.222807 ;
+      app.googleMapPos(lat,lang);  
    }
 }
 
@@ -71,13 +73,17 @@ var app = {
     // Application Constructor
     initialize: function() {
         this.bindEvents();
-        this.googleMap();
+        this.googleMap(-8.673826,115.222807);
     },
 
-    googleMap(){
+    googleMap(lat,lang){
+        var myLatlng = new google.maps.LatLng(lat,lang);
+        var mapOptions = {zoom: 7,center: myLatlng}
+        var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+    },
+
+    googleMapPos(lat,lang){
         //Google Maps
-        var lat = -8.673826 ;
-        var lang = 115.222807 ;
         var myLatlng = new google.maps.LatLng(lat,lang);
         var mapOptions = {zoom: 15,center: myLatlng}
         var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
