@@ -87,22 +87,7 @@ var app = {
         var myLatlng = new google.maps.LatLng(lat,lang);
         var mapOptions = {zoom: 7,center: myLatlng}
         var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-         
-        //fetch data
-        $.ajax({
-             type: "POST",
-             url:window.location.href+"proxy/https://zennagames.000webhostapp.com/android_data/fivefoot/select.php",
-             data: {},
-             crossDomain: true,
-             cache: false,
-             beforeSend: function(){
-               //$("#insert").val('Connecting...');
-             },
-             success: function(data){
-                dataParsed = JSON.parse(data);
-                alert(dataParsed["PEOPLE"]);
-             }
-        });
+      
     },
 
     googleMapPos(lat,lang){
@@ -129,6 +114,22 @@ var app = {
 
         document.getElementById("getPosition").addEventListener("click", getPosition);
         document.getElementById("watchPosition").addEventListener("click", watchPosition);
+
+        //fetch data
+        $.ajax({
+             type: "POST",
+             url:"https://zennagames.000webhostapp.com/android_data/fivefoot/select.php",
+             data: {},
+             crossDomain: true,
+             cache: false,
+             beforeSend: function(){
+               //$("#insert").val('Connecting...');
+             },
+             success: function(data){
+                 dataParsed = JSON.parse(data);
+                 alert(dataParsed["PEOPLE"]);
+             }
+        });
     },
     // Update DOM on a Received Event
     receivedEvent: function(id) {
