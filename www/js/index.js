@@ -91,7 +91,7 @@ var app = {
         //fetch data
         $.ajax({
              type: "POST",
-             url:"https://zenna.esy.es/fivefoot/people_select.php",
+             url:window.location.href+"proxy/https://zennagames.000webhostapp.com/android_data/fivefoot/select.php",
              data: {},
              crossDomain: true,
              cache: false,
@@ -99,8 +99,8 @@ var app = {
                //$("#insert").val('Connecting...');
              },
              success: function(data){
-                 var dataParsed = JSON.parse(data);
-                 alert(dataParsed);
+                dataParsed = JSON.parse(data);
+                alert(dataParsed["PEOPLE"]);
              }
         });
     },
