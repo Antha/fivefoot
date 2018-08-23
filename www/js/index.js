@@ -28,17 +28,17 @@
    function onSuccess(position) {
      var lat = position.coords.latitude;         
      var lang = position.coords.longitude; 
-     app.googleMapPos(lat,lang);
+     googleMapPos(lat,lang);
      alert("Setting Position Success !!!"); 
      $("#loading").html("");
    };
 
    function onError(error) {
       //alert('code: '    + error.code    + '\n' +'message: ' + error.message + '\n');
-      var lat = -8.573826 ;
+      var lat = -9.573826 ;
       var lang = 115.222807 ;
-      app.googleMapPos(lat,lang);  
-      alert("Setting Position Success !!!"); 
+      googleMapPos(lat,lang);  
+      alert("Setting Position Error !!!"); 
       $("#loading").html("");
    }
 
@@ -55,7 +55,8 @@ function watchPosition() {
    function onSuccess(position) {
        var lat = position.coords.latitude;         
        var lang = position.coords.longitude; 
-       app.googleMapPos(lat,lang); 
+       googleMapPos(lat,lang); 
+       alert("Setting Position Success !!!"); 
       /*alert('Latitude: '          + position.coords.latitude          + '\n' +
          'Longitude: '         + position.coords.longitude         + '\n' +
          'Altitude: '          + position.coords.altitude          + '\n' +
@@ -69,35 +70,41 @@ function watchPosition() {
 
    function onError(error) {
       //alert('code: '    + error.code    + '\n' +'message: ' + error.message + '\n');
-      var lat = -8.673826 ;
+      var lat = -8.773826 ;
       var lang = 115.222807 ;
       app.googleMapPos(lat,lang);  
+      alert("Setting Position Error !!!"); 
    }
 }
+
+function googleMapPos(lat,lang){
+        //Google Maps
+        myLatlng = new google.maps.LatLng(lat,lang);
+        var marker = new google.maps.Marker({
+            position: myLatlng,
+            map: map,
+            animation: google.maps.Animation.DROP
+        });
+        map.setZoom(7);
+        map.setCenter(marker.getPosition());
+}
+
+function googleMap(lat,lang){
+        myLatlng = new google.maps.LatLng(lat,lang);
+        mapOptions = {zoom: 7,center: myLatlng}
+        map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+}
+
+var myLatlng ;
+var mapOptions ;
+var map ;
 
 var app = {
     // Application Constructor
     initialize: function() {
         this.bindEvents();
-        this.googleMap(-8.673826,115.222807);
-
+        googleMap(-8.673826,115.222807);
     },
-
-    googleMap(lat,lang){
-        var myLatlng = new google.maps.LatLng(lat,lang);
-        var mapOptions = {zoom: 7,center: myLatlng}
-        var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-      
-    },
-
-    googleMapPos(lat,lang){
-        //Google Maps
-        var myLatlng = new google.maps.LatLng(lat,lang);
-        var mapOptions = {zoom: 15,center: myLatlng}
-        var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-        var marker = new google.maps.Marker({position: myLatlng,map: map});
-    },
-
     // Bind Event Listeners
     //
     // Bind any events that are required on startup. Common events are:
@@ -127,7 +134,13 @@ var app = {
              },
              success: function(data){
                  dataParsed = JSON.parse(data);
-                 alert(dataParsed["PEOPLE"]);
+                 LONG = dataParsed.LONG;
+                 LAT = dataParsed.LAT;
+                 //alert(dataParsed["PEOPLE"]);
+
+                 for (var i = 0; i < LONG.length; i++) {
+                    googleMapPos(LAT[i],LONG[i]);
+                 }
              }
         });
     },
