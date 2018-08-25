@@ -26,24 +26,27 @@
    var watchID = navigator.geolocation.getCurrentPosition(onSuccess, onError, options);
 
    function onSuccess(position) {
+     $("#loading").html("");
      var lat = position.coords.latitude;         
      var lang = position.coords.longitude; 
-     googleMapPos(lat,lang,"red.png");
+     googleMapPos(lat,lang,"red.png",$("#PEOPLE_NAME").val());
+     app.doInsert(lat,lang,$("#PEOPLE_NAME").val());
      alert("Setting Position Success !!!"); 
-     $("#loading").html("");
    };
 
    function onError(error) {
       //alert('code: '    + error.code    + '\n' +'message: ' + error.message + '\n');
+      $("#loading").html("");
       var lat = -9.573826 ;
       var lang = 115.222807 ;
-      googleMapPos(lat,lang,"red.png");  
+      googleMapPos(lat,lang,"red.png",$("#PEOPLE_NAME").val());  
+      app.doInsert(lat,lang,$("#PEOPLE_NAME").val());
       alert("Setting Position Error !!!"); 
-      $("#loading").html("");
    }
 
 }
 
+/*
 function watchPosition() {
    var options = {
       maximumAge: 3600000,
@@ -57,32 +60,30 @@ function watchPosition() {
        var lang = position.coords.longitude; 
        googleMapPos(lat,lang,"red.png"); 
        alert("Setting Position Success !!!"); 
-      /*alert('Latitude: '          + position.coords.latitude          + '\n' +
-         'Longitude: '         + position.coords.longitude         + '\n' +
-         'Altitude: '          + position.coords.altitude          + '\n' +
-         'Accuracy: '          + position.coords.accuracy          + '\n' +
-         'Altitude Accuracy: ' + position.coords.altitudeAccuracy  + '\n' +
-         'Heading: '           + position.coords.heading           + '\n' +
-         'Speed: '             + position.coords.speed             + '\n' +
-         'Timestamp: '         + position.timestamp                + '\n');*/
-       
    };
 
    function onError(error) {
       //alert('code: '    + error.code    + '\n' +'message: ' + error.message + '\n');
       var lat = -8.773826 ;
       var lang = 115.222807 ;
-      googleMapPos(lat,lang,"red.png");   
+      googleMapPos(lat,lang,"red.png");  
+      app.doInsert(lat,lang); 
       alert("Setting Position Error !!!"); 
    }
+}*/
+
+function googleMap(lat,lang){
+        myLatlng = new google.maps.LatLng(lat,lang);
+        mapOptions = {zoom: 8,center: myLatlng}
+        map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 }
 
-function googleMapPos(lat,lang,iconurl){
+function googleMapPos(lat,lang,iconurl,people){
         var icon = {
-            url: "img/"+iconurl, // url
-            scaledSize: new google.maps.Size(10, 10), // scaled size
-            origin: new google.maps.Point(0,0), // origin
-            anchor: new google.maps.Point(0, 0) // anchor
+            url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+            labelOrigin: new google.maps.Point(0, 0),
+            size: new google.maps.Size(32,32),
+            anchor: new google.maps.Point(0,0)
         };
 
         //Google Maps
@@ -91,16 +92,35 @@ function googleMapPos(lat,lang,iconurl){
             position: myLatlng,
             map: map,
             animation: google.maps.Animation.DROP,
-            icon: icon
+            icon: icon,
+            labelAnchor: new google.maps.Point(20, 0),
+            label:  {
+              text: people,
+              color: "black",
+              fontSize: "10px",
+              fontWeight: "bold",
+            }
         });
-        map.setZoom(10);
         map.setCenter(marker.getPosition());
 }
 
-function googleMap(lat,lang){
-        myLatlng = new google.maps.LatLng(lat,lang);
-        mapOptions = {zoom: 7,center: myLatlng}
-        map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+function insertMap(lat,lang,people){
+        //fetch data
+        $.ajax({
+             type: "POST",
+             url:"https://zennagames.000webhostapp.com/android_data/fivefoot/insert.php",
+             data: {LAT:lat,LONG:lang,PEOPLE:people},
+             crossDomain: true,
+             cache: false,
+             success: function(data){
+                 dataParsed = JSON.parse(data);
+                 //alert(dataParsed["PEOPLE"]);
+
+                 /*for (var i = 0; i < LONG.length; i++) {
+                    googleMapPos(LAT[i],LONG[i],"red.png");
+                 }*/
+             }
+        });
 }
 
 var myLatlng ;
@@ -125,78 +145,34 @@ var app = {
     // The scope of 'this' is the event. In order to call the 'receivedEvent'
     // function, we must explicitly call 'app.receivedEvent(...);'
     onDeviceReady: function() {
-        app.receivedEvent('deviceready');
-
-        document.getElementById("getPosition").addEventListener("click", getPosition);
-        document.getElementById("watchPosition").addEventListener("click", watchPosition);
-
+        //document.getElementById("getPosition").addEventListener("click", getPosition);
+        //document.getElementById("watchPosition").addEventListener("click", watchPosition);
         //fetch data
         $.ajax({
-             type: "POST",
+             type: "GET",
              url:"https://zennagames.000webhostapp.com/android_data/fivefoot/select.php",
              data: {},
              crossDomain: true,
              cache: false,
-             beforeSend: function(){
-               //$("#insert").val('Connecting...');
+             beforeSend: function () {
+                
              },
              success: function(data){
                  dataParsed = JSON.parse(data);
                  LONG = dataParsed.LONG;
                  LAT = dataParsed.LAT;
+                 PEOPLE = dataParsed.PEOPLE;
                  //alert(dataParsed["PEOPLE"]);
 
                  for (var i = 0; i < LONG.length; i++) {
-                    googleMapPos(LAT[i],LONG[i]);
+                    googleMapPos(LAT[i],LONG[i],"red.png",PEOPLE[i]);
                  }
              }
         });
-
-        //fetch data satellite revenue
-        $.ajax({
-             type: "POST",
-             url:"http://10.67.98.98/mapsbligusto/branch/bali.php",
-             data: {},
-             crossDomain: true,
-             cache: false,
-             beforeSend: function(){
-               $("#loading").html("<img src='img/loading.gif' />");
-             },
-             success: function(data){
-                 dataParsed = JSON.parse(data);
-                 RESULT = dataParsed.result;
-
-                 for (var i = 0; i < RESULT.length; i++) {
-                    googleMapPos(RESULT[i]["LAT"],RESULT[i]["LONG"],"blue.png");
-                 }
-
-                 $("#loading").html("");
-             }
-        });
-
-
-        //fetch data satellite outlet
-        $.ajax({
-             type: "POST",
-             url:"http://10.67.98.98/mapsbligusto/branch/outleet/bali.php",
-             data: {},
-             crossDomain: true,
-             cache: false,
-             beforeSend: function(){
-               $("#loading").html("<img src='img/loading.gif' />");
-             },
-             success: function(data){
-                 dataParsed = JSON.parse(data);
-                 RESULT = dataParsed.result;
-
-                 for (var i = 0; i < RESULT.length; i++) {
-                    googleMapPos(RESULT[i]["LAT"],RESULT[i]["LONG"],"green.png");
-                 }
-
-                 $("#loading").html("");
-             }
-        });
-
+    },
+    doInsert: function(lat,lang,people){
+      //alert("Test");
+      document.addEventListener('deviceready', insertMap(lat,lang,people), false);
     },
     // Update DOM on a Received Event
     receivedEvent: function(id) {
@@ -210,3 +186,13 @@ var app = {
         console.log('Received Event: ' + id);*/
     }
 };
+
+
+$("#getPosition").click(function(){
+  if($("#PEOPLE_NAME").val() == ""){
+    alert("PLEASE INSERT YOUR NAME");
+    return false;
+  }
+  getPosition();
+  app.doInsert();
+});
