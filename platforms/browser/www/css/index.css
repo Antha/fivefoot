@@ -117,3 +117,16 @@ h1 {
 #loading img{
     width: 50px;
 }
+
+#data-table{
+    height: 100px;
+    overflow: auto;
+}
+
+#data-table table{
+    width: 100%;
+}
+
+#data-table table thead tr td{
+    font-weight: bold;
+}

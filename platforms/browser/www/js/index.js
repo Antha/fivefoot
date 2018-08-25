@@ -104,6 +104,11 @@ function googleMapPos(lat,lang,iconurl,people){
         map.setCenter(marker.getPosition());
 }
 
+function goto(lat,long){
+  map.setZoom(17);      // This will trigger a zoom_changed on the map
+  map.setCenter(new google.maps.LatLng(lat, long));
+}
+
 function insertMap(lat,lang,people){
         //fetch data
         $.ajax({
@@ -147,6 +152,7 @@ var app = {
     onDeviceReady: function() {
         //document.getElementById("getPosition").addEventListener("click", getPosition);
         //document.getElementById("watchPosition").addEventListener("click", watchPosition);
+        
         //fetch data
         $.ajax({
              type: "GET",
@@ -162,10 +168,18 @@ var app = {
                  LONG = dataParsed.LONG;
                  LAT = dataParsed.LAT;
                  PEOPLE = dataParsed.PEOPLE;
+                 THETIME = dataParsed.THETIME;
                  //alert(dataParsed["PEOPLE"]);
 
                  for (var i = 0; i < LONG.length; i++) {
-                    googleMapPos(LAT[i],LONG[i],"red.png",PEOPLE[i]);
+                    googleMapPos(LAT[i],LONG[i],"red.png",PEOPLE[i]+" "+THETIME[i]);
+
+                    //insert into table
+                    $("#data-table table tbody").append(
+                      '<tr>'+
+                      '<td>'+PEOPLE[i]+'</td>'+
+                      '<td><button onclick="goto(\''+LAT[i]+'\',\''+LONG[i]+'\')">GO</button></td>'+
+                      '</tr>'); 
                  }
              }
         });
